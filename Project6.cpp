@@ -59,6 +59,44 @@ void vvod(int &m, tv *&n, int &m1)
 	return;
 }
 
+void udal(int &m, tv *&n, int &m1)
+{
+	if ((m1 == 1) && (m != 0))
+	{
+		int a = 0;
+		printf("Which note about TV you want to delete?\n");
+		cin >> a;
+		while ((a < 1) || (a > m))
+		{
+			printf("Error! Try again...\n");
+			cin >> a;
+		}
+		tv *j = new tv[m - 1];
+		for (int i = 0; i <= m - 1; i++)
+		{
+			if (i < a - 1)
+			{
+				j[i] = n[i];
+			}
+			if (i > a - 1)
+			{
+				j[i - 1] = n[i];
+			}
+		}
+		delete[] n;
+		n = j;
+		m--;
+		printf("Ready!\n");
+	}
+	else
+	{
+		printf("No data found!\n");
+	}
+	system("pause");
+	system("cls");
+	return;
+}
+
 void print(int m, tv *&n)
 {
 	for (int i = 0; i < m; i++)
@@ -183,15 +221,88 @@ void sort(tv *&n, int m, int m1)
 	return;
 }
 
+void load(int &m1, tv *&n, int &m)
+{
+	int a = 0;
+	ifstream fin("info.txt");
+	fin >> a;
+	if (a == 0)
+	{
+		printf("No saved data found!\n");
+		system("pause");
+		system("cls");
+		return;
+	}
+	if (m1 == 0)
+	{
+		n = new tv[a];
+		for (int i = 0; i < a; i++)
+		{
+			fin >> n[i].maker;
+			fin >> n[i].diag;
+			fin >> n[i].color;
+			fin >> n[i].price;
+		}
+		m1 = 1;
+		m = a;
+	}
+	else
+	{
+		tv *t = new tv[m + a];
+		for (int i = 0; i < m; i++)
+		{
+			t[i] = n[i];
+		}
+		delete[] n;
+		n = t;
+		for (int i = 0; i < a; i++)
+		{
+			fin >> n[m + i].maker;
+			fin >> n[m + i].diag;
+			fin >> n[m + i].color;
+			fin >> n[m + i].price;
+		}
+		m += a;
+	}
+	fin.close();
+	printf("Load successful!\n");
+	system("pause");
+	system("cls");
+}
+
+void save(int m, tv *n, int m1)
+{
+	if ((m1 == 1) && (m != 0))
+	{
+		ofstream fout("info.txt");
+		fout << m << "\n";
+		for (int i = 0; i < m; i++)
+		{
+			fout << n[i].maker << "\n";
+			fout << n[i].diag << "\n";
+			fout << n[i].color << "\n";
+			fout << n[i].price << "\n";
+		}
+		fout.close();
+		printf("Save successful!\n");
+	}
+	else
+	{
+		printf("Nothing to save!\n");
+	}
+	system("pause");
+	system("cls");
+}
+
 int main()
 {
 	tv *n = NULL;
 	int st = 0, m = 0, m1 = 0;
-	while (st != 4)
+	while (st != 7)
 	{
-		printf("1.Enter new TV\n2.Printing all TV\n3.Sort notes\n4.Exit.\n");
+		printf("1.Enter new TV\n2.Delete any note\n3.Printing all TV\n4.Sort notes\n5.Load data\n6.Save data\n7.Exit.\n");
 		scanf_s("%d", &st);
-		while ((st < 1) || (st > 4))
+		while ((st < 1) || (st > 7))
 		{
 			printf("Error! Try again...\n");
 			scanf_s("%d", &st);
@@ -200,14 +311,17 @@ int main()
 		switch (st)
 		{
 		case 1: vvod(m, n, m1); break;
-		case 2: print(m, n); break;
-		case 3: sort(n, m, m1); break;
-		case 4:
+		case 2: udal(m, n, m1); break;
+		case 3: print(m, n); break;
+		case 4: sort(n, m, m1); break;
+		case 5: load(m1, n, m); break;
+		case 6: save(m, n, m1); break;
+		case 7:
 			if (m1 == 1)
 			{
-				printf("All data will be erased. Exit?\n1.Yes\n2.No\n");
+				printf("All data will be erased. Save before exit?\n1.Yes\n2.No,exit\n3.Cancel\n");
 				cin >> st;
-				while ((st < 1) || (st > 2))
+				while ((st < 1) || (st > 3))
 				{
 					printf("Error! Try again...\n");
 					cin >> st;
@@ -216,12 +330,19 @@ int main()
 				{
 				case 1:
 				{
+					save(m, n, m1);
 					delete[] n;
-					st = 4;
+					return 0;
 				}
 				case 2:
 				{
-						st = 0;
+						st = 7;
+						delete[] n;
+						return 0;
+				}
+				case 3:
+				{
+					st = 0;
 				}
 			system("cls");
 				}
